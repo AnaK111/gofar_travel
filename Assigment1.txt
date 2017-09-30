@@ -1,0 +1,162 @@
+-- Asignatura   	:  Administración de Base de Datos Avanzada
+-- Taller       	:  Assigments 1
+-- Estudiantes  	:  Sebastián Alejandro Arias Mejia
+--                 	   Ana Karina Largo Ramos
+
+-- ********************************( 2 )****************************************
+
+-- 2.  Create 3 tablespaces (0.2):
+--  a. First one with 1 Gb and 3 datafiles, tablespace should be named
+--     "hospital_bills".
+--  b. Second one with 500 Mb and 1 datafile, named "test_purposes".
+--  c. Undo tablespace with 5Mb of space and 1 datafile.
+
+-- Solution 2:
+
+-- a. First one with 1 Gb and 3 datafiles, tablespace should be named "hospital_bills"
+
+CREATE TABLESPACE hospital_bills DATAFILE
+'hospital_bills_df1' SIZE 500M,
+'hospital_bills_df2' SIZE 400M,
+'hospital_bills_df3' SIZE 124M
+EXTENT MANAGEMENT LOCAL 
+SEGMENT SPACE MANAGEMENT AUTO;
+
+-- b. Second one with 500 Mb and 1 datafile, named "test_purposes".
+
+CREATE TABLESPACE test_purposes DATAFILE
+'test_purposes?1' SIZE 500M
+EXTENT MANAGEMENT LOCAL 
+SEGMENT SPACE MANAGEMENT AUTO;
+
+-- c. Undo tablespace with 5Mb of space and 1 datafile.
+
+CREATE UNDO TABLESPACE Undo_Tbs DATAFILE
+ 'Undo_Tbs1.dbf' SIZE 5M
+AUTOEXTEND OFF;
+
+-- ********************************( 3 )****************************************
+
+-- 3. Set the undo tablespace to be used in the system (0.2)
+
+-- Solution 3:
+
+ALTER SYSTEM SET UNDO_TABLESPACE = Undo_tbs scope = both;
+
+-- ********************************( 4 )****************************************
+
+-- 4. Create a DBA user and assign it to the tablespace called "hospital_bills",
+--    this user has unlimited space on the tablespace (0.2)
+
+-- Solution 4:
+
+CREATE USER DBA_USER IDENTIFIED BY DBA_USER_123
+DEFAULT TABLESPACE hospital_bills
+QUOTA UNLIMITED ON hospital_bills;
+
+-- ********************************( 5 )****************************************
+
+-- 5. Assign the dba role and permissions to connect to the user just created(0.2)
+
+-- Solution 5:
+
+-- Assign the dba role (GRANT DBA TO DBA_USER;)
+-- Assign permissions to connect to the user (GRANT CONNECT, RESOURCE TO DBA_USER)
+GRANT CONNECT, RESOURCE, DBA TO DBA_USER;
+
+-- ********************************( 6 )****************************************
+
+-- 6. Create 3 profiles. (0.2)
+--  a. Profile 1: "manager " password life 40 days, one session per user, 
+--     15 minutes idle, 4 failed login attempts.
+--  b. Profile 2: "finance " password life 15 days, one session per user, 
+--     3 minutes idle, 2 failed login attempts.
+--  c. Profile 3: "development " password life 100 days, two session per user, 
+--     30 minutes idle, no failed login attempts.
+
+-- Solution 6:
+
+--  a. Profile 1: "manager " password life 40 days, one session per user, 
+--     15 minutes idle, 4 failed login attempts.
+
+CREATE PROFILE manager_profile LIMIT
+    PASSWORD_LIFE_TIME     40
+    SESSIONS_PER_USER      1 
+    IDLE_TIME              15 
+    FAILED_LOGIN_ATTEMPTS  4 ; 
+
+--  b. Profile 2: "finance " password life 15 days, one session per user, 
+--     3 minutes idle, 2 failed login attempts.
+
+CREATE PROFILE fince_profile LIMIT
+    PASSWORD_LIFE_TIME     15
+    SESSIONS_PER_USER      1 
+    IDLE_TIME              3 
+    FAILED_LOGIN_ATTEMPTS  2 ;
+    
+--  c. Profile 3: "development " password life 100 days, two session per user, 
+--     30 minutes idle, no failed login attempts.
+
+CREATE PROFILE development_profile LIMIT
+    PASSWORD_LIFE_TIME     100
+    SESSIONS_PER_USER      2 
+    IDLE_TIME              30 
+    FAILED_LOGIN_ATTEMPTS  UNLIMITED;
+    
+-- ********************************( 7 )****************************************
+    
+-- 7. Create 4 users, assign them the tablespace "hospital_bills"; profiles 
+--    created should be used for the users, all the users should be allow to 
+--    connect to the database. (0.2)
+
+-- Solution 7:
+
+-- Create 4 users, assign them the tablespace "hospital_bills"; profiles 
+-- created should be used for the users.
+CREATE USER User_1
+IDENTIFIED BY User1_123
+DEFAULT tablespace hospital_bills
+PROFILE manager_profile;
+
+CREATE USER User_2
+IDENTIFIED BY User2_123
+DEFAULT tablespace hospital_bills
+PROFILE fince_profile;
+
+CREATE USER User_3
+IDENTIFIED BY User3_123
+DEFAULT tablespace hospital_bills
+PROFILE  development_profile ;
+
+CREATE USER User_4
+IDENTIFIED BY User4_123
+DEFAULT tablespace hospital_bills
+PROFILE  development_profile ;
+
+-- All the users should be allow to connect to the database.
+GRANT CREATE SESSION TO  
+ User_1, User_2,  User_3,  User_4;
+ 
+-- ********************************( 8 )****************************************
+ 
+-- 8.Lock the users associate with profiles: manager and finance . (0.2)
+
+-- Manager
+ALTER USER User_1
+ACCOUNT LOCK ;  
+
+-- Finance
+ALTER USER User_2
+ACCOUNT LOCK ;
+
+
+-- ********************************( 9 )****************************************
+
+-- 9. Delete the tablespace called "test_purposes " (0.2)
+
+-- Solution 9:
+
+DROP TABLESPACE test_purposes;
+
+-- DROP TABLESPACE test_purposes 
+-- INCLUDING CONTENTS AND DATAFILES ;
