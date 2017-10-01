@@ -160,3 +160,176 @@ DROP TABLESPACE test_purposes;
 
 -- DROP TABLESPACE test_purposes 
 -- INCLUDING CONTENTS AND DATAFILES ;
+
+
+-- ********************************( 10 )****************************************
+ 
+-- 10. Create tables with its columns according to your normalization.Create sequences 
+--    for every primary key. Create primary and foreign keys. Insert at least 10 patients, 5
+--    cost centers, items for each cost center (2 or 3) (Go to http://www.generatedata.com/). 
+--    This should be a functional single script (.sql) (Better if you generate sql through
+--    sql developer).
+
+-- Solution 10:
+
+-- Create tables with its columns according to your normalization. 
+-- Create primary and foreign keys
+
+create table COST_CENTER(
+Id_Cost_Center number not null,
+Cost_Code number not null, 
+Cost_Name varchar2(200) not null, 
+CONSTRAINT PK_COST_CENTER_Id_Cost_Center PRIMARY KEY(Id_Cost_Center));
+
+create table ITEM (
+Id_Item number not null,
+Item_Code number unique not null,
+Description varchar2(200) not null,
+Chargue decimal not null,
+Cost_Center_Id number not null,
+CONSTRAINT PK_ITEM_Id_Item PRIMARY KEY(Id_Item),
+CONSTRAINT FK_COST_CENTER_Id_Cost_Center FOREIGN KEY (Cost_Center_Id) REFERENCES COST_CENTER(Id_Cost_Center));
+
+create table STATES (
+Id_State number not null,
+State_Name varchar2(200) not null, 
+CONSTRAINT PK_STATES_Id_State PRIMARY KEY(Id_State));
+
+create table CITY (
+Id_City number not null,
+City varchar2(200) not null, 
+Zip varchar2(50) unique not null,
+State_Id number not null,
+CONSTRAINT PK_CITY_Id_City PRIMARY KEY(Id_City),
+CONSTRAINT FK_STATES_Id_State FOREIGN KEY (State_Id) REFERENCES States(Id_State));
+
+create table PATIENT (
+Id_Patient number not null, 
+Patient_Number number unique not null, 
+Patient_Name varchar2(200) not null,
+Patient_Address varchar2(200)not null,
+City_Id number(20) not null,
+CONSTRAINT PK_PATIENT_Id_Patient PRIMARY KEY(Id_Patient),
+CONSTRAINT FK_CITY_Id_City FOREIGN KEY (City_Id) REFERENCES CITY(Id_City));
+
+create table BILL (
+Id_Bill number not null,
+Dates varchar2(10) not null, 
+Date_Admitted varchar2(10) not null,
+Dischargue_Date varchar2(10) not null,
+Balance_Due decimal not null,
+Patient_Id number not null,
+CONSTRAINT PK_BILL_Id_Bill PRIMARY KEY(Id_Bill),
+CONSTRAINT FK_PATIENT_Id_Patient FOREIGN KEY (Patient_Id) REFERENCES PATIENT(Id_Patient));
+
+create table BILL_DETAIL(
+Id_Bill_Detail number not null,
+Date_Charge varchar2(50) not null,
+Bill_Id number not null,
+Item_Id number not null,
+CONSTRAINT PK_BILL_DETAIL_Id_Bill_Detail PRIMARY KEY(Id_Bill_Detail),
+CONSTRAINT FK_BILL_Id_Bill FOREIGN KEY (Bill_Id) REFERENCES BILL(Id_Bill),
+CONSTRAINT FK_ITEM_Id_Item FOREIGN KEY (Item_Id) REFERENCES ITEM(Id_Item));
+
+-- -- Create sequences for every primary key
+
+CREATE SEQUENCE Id_Bill_Detail
+INCREMENT BY 1
+START WITH 1;
+
+CREATE SEQUENCE Id_Cost_Center
+INCREMENT BY 1
+START WITH 1;
+
+CREATE SEQUENCE Id_Item
+INCREMENT BY 1
+START WITH 1;
+
+CREATE SEQUENCE Id_Bill
+INCREMENT BY 1
+START WITH 1;
+
+CREATE SEQUENCE Id_States
+INCREMENT BY 1
+START WITH 1;
+
+CREATE SEQUENCE Id_City
+INCREMENT BY 1
+START WITH 1;
+
+CREATE SEQUENCE Id_Patient
+INCREMENT BY 1
+START WITH 1;
+
+-- Insert at least 10 patients, 5 cost centers, items for each cost center (2 or 3)
+
+--Insert STATES
+INSERT INTO STATES VALUES (Id_States.nextval, 'Antioquia');
+INSERT INTO STATES VALUES (Id_States.nextval, 'Cundinamarca');
+INSERT INTO STATES VALUES (Id_States.nextval, 'Atlántico');
+
+--Insert CITY
+INSERT INTO CITY VALUES (Id_City.nextval, 'Medellin','0001',1);
+INSERT INTO CITY VALUES (Id_City.nextval, 'Bógota','0002',2);
+INSERT INTO CITY VALUES (Id_City.nextval, 'Barranquilla','0003',3);
+
+--Insert PATIENT
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 1,'Paciente 1','Calle 1',1);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 2,'Paciente 2','Calle 2',2);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 3,'Paciente 3','Calle 3',3);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 4,'Paciente 4','Calle 4',1);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 5,'Paciente 5','Calle 5',2);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 6,'Paciente 6','Calle 6',3);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 7,'Paciente 7','Calle 7',1);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 8,'Paciente 8','Calle 8',2);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 9,'Paciente 9','Calle 9',3);
+INSERT INTO PATIENT VALUES (Id_Patient.nextval, 10,'Paciente 10','Calle 10',1);
+
+--Insert COST_CENTER
+INSERT INTO COST_CENTER VALUES (Id_Cost_Center.nextval, 1,'Centro Costo 1');
+INSERT INTO COST_CENTER VALUES (Id_Cost_Center.nextval, 2,'Centro Costo 2');
+INSERT INTO COST_CENTER VALUES (Id_Cost_Center.nextval, 3,'Centro Costo 3');
+INSERT INTO COST_CENTER VALUES (Id_Cost_Center.nextval, 4,'Centro Costo 4');
+INSERT INTO COST_CENTER VALUES (Id_Cost_Center.nextval, 5,'Centro Costo 5');
+
+--Insert ITEM
+INSERT INTO ITEM VALUES (Id_Item.nextval, 1,'Item 1',1001,1);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 2,'Item 2',1002,1);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 3,'Item 3',2001,2);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 4,'Item 4',2002,2);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 5,'Item 5',3001,3);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 6,'Item 6',3002,3);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 7,'Item 7',4001,4);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 8,'Item 8',4002,4);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 9,'Item 9',5001,5);
+INSERT INTO ITEM VALUES (Id_Item.nextval, 10,'Item 10',5002,5);
+
+--Insert BILL (formato fechas aaaammdd)
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170101','20170102','20170103',1001,1);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170201','20170202','20170203',2003,2);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170301','20170302','20170303',2001,3);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170401','20170402','20170403',8005,4);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170501','20170502','20170503',4001,5);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170601','20170602','20170603',9003,6);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170701','20170702','20170703',5002,7);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170801','20170802','20170803',2003,8);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20170901','20170902','20170903',4003,9);
+INSERT INTO BILL VALUES (Id_Bill.nextval, '20171001','20171002','20171003',3001,10);
+
+--Insert BILL_DETAIL (formato fechas aaaammdd)
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170102',1,1);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170202',2,1);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170202',2,2);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170302',3,3);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170402',4,4);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170402',4,5);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170402',4,6);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170502',5,7);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170602',6,8);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170602',6,9);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170702',7,10);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170802',8,1);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170802',8,2);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170902',9,3);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20170902',9,4);
+INSERT INTO BILL_DETAIL VALUES (Id_Bill_Detail.nextval, '20171002',10,5);
